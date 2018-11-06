@@ -1,5 +1,6 @@
 var morgan = require('morgan');
-var winston = require('./config/winston.js');
+require('dotenv').config();
+var winston = require('./utils/winston.js');
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 //import TYPES from './types';
@@ -33,6 +34,6 @@ app.use(function (err: Error, req: express.Request, res: express.Response, next:
     res.status(500).send('Internal Server Error');
 });
 
-app.listen(3000, function () {
+app.listen(process.env.PORT, function () {
     winston.info('Example app listening on port 3000!');
 });
