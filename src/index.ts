@@ -3,6 +3,9 @@ require('dotenv').config();
 var winston = require('./utils/winston.js');
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
+import * as Bluebird from "bluebird";
+declare global { export interface Promise<T> extends Bluebird<T> {} }
+
 //import TYPES from './types';
 //import container from './inversify.config';
 //import {RegistrableController} from './controller/RegisterableController';
@@ -13,7 +16,7 @@ const app: express.Application = express();
 app.use(bodyParser.json());
 app.use(morgan('combined', { stream: winston.stream }));
 
-// grabs the Controller from IoC container and registers all the endpoints
+// grabs the controller from IoC container and registers all the endpoints
 //const controllers: RegistrableController[] = container.getAll<RegistrableController>(TYPES.Controller);
 //controllers.forEach(controller => controller.register(app));
 
@@ -26,7 +29,6 @@ app.use(function (err: Error, req: express.Request, res: express.Response, next:
 
     // add this line to include winston logging
     winston.error(`${err.stack || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-
     next(err);
 });
 
