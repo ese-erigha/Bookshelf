@@ -3,6 +3,7 @@ import { SchemaType } from './schema';
 import { RepositoryType } from './repository';
 import { ServiceType } from './service';
 import { DBType } from './database';
+import {ValidatorType} from './validator';
 
 
 export {
@@ -10,5 +11,6 @@ export {
     RepositoryType,
     ServiceType,
     DBType,
-    ControllerType
+    ControllerType,
+    ValidatorType
 };

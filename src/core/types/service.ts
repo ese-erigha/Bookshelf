@@ -1,4 +1,6 @@
 export const ServiceType = {
-    IEntityService: Symbol('EntityService'),
-    IAuthorService: Symbol('AuthorService')
+    IEntityService: Symbol.for('EntityService'),
+    IAuthorService: Symbol.for('AuthorService'),
+    ICategoryService: Symbol.for('CategoryService'),
+    IBookService: Symbol.for('BookService')
 };

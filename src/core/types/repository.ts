@@ -1,4 +1,6 @@
 export const RepositoryType = {
-    IGenericRepository: Symbol('GenericRepository'),
-    IAuthorRepository: Symbol('AuthorRepository')
+    IGenericRepository: Symbol.for('GenericRepository'),
+    IAuthorRepository: Symbol.for('AuthorRepository'),
+    ICategoryRepository: Symbol.for('CategoryRepository'),
+    IBookRepository: Symbol.for('BookRepository')
 };

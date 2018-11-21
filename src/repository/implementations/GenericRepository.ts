@@ -1,46 +1,65 @@
+import { IDatabaseFactory } from './../../core/interfaces/IDatabaseFactory';
 import { IEntityModel } from './../../model/entity/interfaces/index';
-import { IDatabaseFactory } from '../../core/interfaces/IDatabaseFactory';
 import { DBType } from './../../core/types/index';
 import { IGenericRepository } from '../interfaces/index';
-import {injectable, inject} from 'inversify';
-import { Model} from "mongoose";
+import {injectable, unmanaged} from 'inversify';
+import { Model, Schema} from "mongoose";
+import {dependencyContainer} from '../../core/dependency.config';
 
 
 
 @injectable()
 export class GenericRepository<T extends IEntityModel> implements IGenericRepository<T>{
 
-    @inject(DBType.IDatabaseFactory) private _dbFactory: IDatabaseFactory;
     protected _dbSet : Model<IEntityModel>;
+    protected _dbFactory: IDatabaseFactory;
+    protected _nameOfModel: string;
     
-    public constructor (nameOfModel:string){
-        this._dbSet = this._dbFactory.connect(nameOfModel);
+    public constructor (@unmanaged() nameOfModel:string){
+         
+        this._dbFactory = dependencyContainer.get<IDatabaseFactory>(DBType.IDatabaseFactory);
+        this._nameOfModel = nameOfModel;
     }
 
-    create(item: T): Promise<boolean> {
-        throw new Error("Method not implemented.");
-    };
+    public async getModel(): Promise<Model<IEntityModel>>{
+        return await this._dbFactory.connect(this._nameOfModel);
+    }
 
-    update(id: string, item: T): Promise<boolean> {
-        throw new Error("Method not implemented.");
-    };
-
-    delete(id: string): Promise<boolean> {
-        throw new Error("Method not implemented.");
-    };
-
-    async findAll(): Promise<IEntityModel[]> {
-        
+    public async create(item: T): Promise<any> {
+      
         try{
 
-            return await this._dbSet.find();
+            this._dbSet = await this.getModel();
+            let doc: IEntityModel = await this._dbSet.create(item);
+            return doc._id;
+
+        }catch(err){
+            throw err;
+        }
+    };
+
+    public update(id: string, item: T): Promise<boolean> {
+        throw new Error("Method not implemented.");
+    };
+
+    public delete(id: string): Promise<boolean> {
+        throw new Error("Method not implemented.");
+    };
+
+    public async findAll(): Promise<any> {
+
+        try{
+
+            this._dbSet = await this.getModel();
+            let models = await this._dbSet.find().lean().exec();
+            return models;
         
         }catch(err){
             throw err;
         }
     };
 
-    findOneById(id: string): Promise<IEntityModel> {
+    public findOneById(id: string): Promise<IEntityModel> {
         throw new Error("Method not implemented.");
     };
 };

@@ -1,10 +1,9 @@
-import * as express from 'express';
-
+import {Application} from 'express';
 
 /**
  * Enables the auto-registration of controllers that implement this interface into index.ts
  */
 export interface RegistrableController {
 
-    register(app:express.Application): void
+    register(app:Application): void
 }

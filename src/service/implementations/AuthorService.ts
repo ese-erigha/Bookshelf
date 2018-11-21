@@ -1,7 +1,7 @@
 import { RepositoryType } from './../../core/types/index';
 import { IAuthorRepository } from './../../repository/interfaces/index';
 import { EntityService } from "./index";
-import { IAuthorModel } from "model/entity/interfaces/index";
+import { IAuthorModel } from "../../model/entity/interfaces/index";
 import { injectable, inject } from "inversify";
 
 

@@ -1,20 +1,22 @@
 import { AuthorSchema } from './../../model/index';
 import { ModelTypes } from './../../model/modelTypes';
-import { IEntityModel } from '../../model/interfaces/IEntityModel';
+import { IEntityModel } from '../../model/entity/interfaces/index';
 import {injectable} from 'inversify';
 import { IDatabaseFactory } from '../interfaces/IDatabaseFactory';
 import { Mongoose, Model, Connection,Schema} from "mongoose";
 import {AppConfig} from '../../utils/config';
-import { IAuthorModel } from 'model/interfaces/IAuthorModel';
-import 'reflect-metadata';
-
+import { IAuthorModel } from '../../model/entity/interfaces/index';
 
 
 @injectable()
 export class DatabaseFactory implements IDatabaseFactory{
 
+    constructor(){
+
+    }
+
     /***
-     * returns a database set (dbSet) of the passed model
+     * returns a database set (dbSet) of the passed schema
      * 
      * @class DatabaseFactory
      * @method connect
@@ -23,16 +25,20 @@ export class DatabaseFactory implements IDatabaseFactory{
      * 
      ***/
 
-    public connect(schemaName: string): Model<IEntityModel>{
+    public async connect(schemaName: string): Promise<Model<IEntityModel>>{
 
-        let connection: Connection = this.getConnection();
+        let connection: Connection = await this.getConnection();
         return this.getModel(schemaName,connection);
     }
 
-    private getConnection() :Connection{
-        let mongoose = new Mongoose(AppConfig.dbUrl);
-        (<any>mongoose).Promise = require("bluebird");
-        const connection: Connection = mongoose.connection;
+    private async getConnection() :Promise<Connection>{
+        
+        //let mongoose = new Mongoose(AppConfig.dbUrl);
+        let mongoose = await new Mongoose().connect(AppConfig.dbUrl);
+        (<any>mongoose).Promise = global.Promise;
+        const connection: Connection =  await mongoose.connection;
+        console.log("got here!!!");
+        console.log("connection state: "+connection.readyState);
         return connection;
     }
 
@@ -45,7 +51,8 @@ export class DatabaseFactory implements IDatabaseFactory{
 
             case ModelTypes.Author:
                 schema = new AuthorSchema().getSchema();
-                model = connection.model<IAuthorModel>(schemaName,schema);
+                model = connection.model<IAuthorModel>(schemaName,schema,schemaName);
+                
                 break;
 
             default:

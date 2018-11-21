@@ -1,3 +1,3 @@
 export const DBType = {
-    IDatabaseFactory: Symbol('DatabaseContext')
+    IDatabaseFactory: Symbol.for('DatabaseContext')
 };

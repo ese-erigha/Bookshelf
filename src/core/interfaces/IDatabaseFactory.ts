@@ -1,6 +1,6 @@
-import { IEntityModel } from './../../model/interfaces/IEntityModel';
+import { IEntityModel } from './../../model/entity/interfaces/index';
 import { Model} from "mongoose";
 
 export interface IDatabaseFactory{
-    connect(schemaName: string) : Model<IEntityModel>;
+    connect(schemaName: string) : Promise<Model<IEntityModel>>;
 }

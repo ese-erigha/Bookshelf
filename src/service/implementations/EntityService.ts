@@ -1,8 +1,8 @@
 import { IEntityService } from './../interfaces/index';
-import { IEntityModel } from "model/entity/interfaces/index";
+import { IEntityModel } from "../../model/entity/interfaces/index";
 import { injectable, inject } from 'inversify';
-import { RepositoryType } from 'core/types/index';
-import { IGenericRepository } from 'repository/interfaces/index';
+import { RepositoryType } from '../../core/types/index';
+import { IGenericRepository } from '../../repository/interfaces/index';
 
 @injectable()
 export class EntityService<T extends IEntityModel> implements IEntityService<IEntityModel>{

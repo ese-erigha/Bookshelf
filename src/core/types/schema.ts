@@ -1,3 +1,3 @@
 export const SchemaType = {
-    IBaseSchema: Symbol('Schema')
+    IBaseSchema: Symbol.for('Schema')
 };

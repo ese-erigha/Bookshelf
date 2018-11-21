@@ -1,3 +1,3 @@
 export const ControllerType = {
-    IAuthorController: Symbol('AuthorController')
+    Controller: Symbol.for('Controller')
 };
