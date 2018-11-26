@@ -1,14 +1,14 @@
-import { BaseEntity, BaseDto } from '../../../src/modules/base/interfaces';
+import { BaseEntity, BaseDto, BaseModel, PaginatedResult } from '../../../src/modules/base/interfaces';
 import { IBaseRepository } from "./interfaces";
-import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
+import { PaginationDto } from './pagination.dto';
 
 @Injectable()
 export class BaseRepository<T extends BaseEntity> implements IBaseRepository<T>{
 
-    protected readonly _dbSet: Model<T>;
+    protected readonly _dbSet: BaseModel<T>;
 
-    constructor(dbSet: Model<T>){
+    constructor(dbSet: BaseModel<T>){
         this._dbSet = dbSet;
     }
 
@@ -21,16 +21,31 @@ export class BaseRepository<T extends BaseEntity> implements IBaseRepository<T>{
         return await this._dbSet.findByIdAndUpdate(id,item,{new: true}).lean().exec();
     };
 
-    public async findAll(): Promise<T[]> {
-        return await this._dbSet.find().lean().exec();
+    public async findAll(paginationDto: PaginationDto): Promise<PaginatedResult<T>> {
+        
+        let paginationOptions = {
+
+            page: paginationDto.page,
+            limit: paginationDto.limit,
+            leanWithId: true
+        };
+        let result: PaginatedResult<T>  = await this._dbSet.paginate({},paginationOptions);
+        result.hasNext = result.page < result.pages;
+        result.hasPrevious = result.page > 1;
+        return result;
+                               
     };
 
     public async findOneById(id: string): Promise<T> {
-        return await this._dbSet.findById(id).lean().exec();
+        return await this._dbSet.findOne({'_id': id}).lean().exec();
     };
 
     public async delete(id: string): Promise<boolean> {
         throw new Error("Method not implemented.");
     };
+
+    public async findOne(cond:object): Promise<T>{
+        return await this._dbSet.findOne(cond).lean().exec();
+    }
     
 };

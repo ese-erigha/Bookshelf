@@ -1,9 +1,9 @@
 import * as mongoose from 'mongoose';
 import * as mongoosePaginate from 'mongoose-paginate';
-let CategorySchema = new mongoose.Schema({
-    name: String,
+let AuthorSchema = new mongoose.Schema({
+    fullName: String,
 },{ bufferCommands: false , timestamps:true});
 
-CategorySchema.plugin(mongoosePaginate);
+AuthorSchema.plugin(mongoosePaginate);
 
-export {CategorySchema};
+export {AuthorSchema};

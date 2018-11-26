@@ -1,5 +1,8 @@
-import { Get, Delete, Param} from '@nestjs/common';
-import { BaseEntity, BaseDto, IBaseService } from '../../../src/modules/base/interfaces';
+import { Get, Delete, Param, Query, UsePipes, ValidationPipe, HttpStatus, HttpException} from '@nestjs/common';
+import { BaseEntity, BaseDto, IBaseService, PaginatedResult } from '../../../src/modules/base/interfaces';
+import {PaginationDto} from './pagination.dto';
+import { ValidateIdPipe } from './pipes/validate-id.pipe';
+
 
 export class BaseController<T extends BaseEntity>{
 
@@ -9,27 +12,35 @@ export class BaseController<T extends BaseEntity>{
         this._service = service;
     }
 
-    public async create(item: BaseDto): Promise<T> {
-        
+    protected async create(item: BaseDto): Promise<T> {
         return await this._service.create(item);
     };
 
-    public async update(id: string, item: BaseDto): Promise<T> {
+    protected async update(id: string, item: BaseDto): Promise<T> {
+        let entity: T = await this._service.findOneById(id);
+        if(entity == null){
+            throw new HttpException(`Item with id: ${id} does not exist`,HttpStatus.NOT_FOUND);
+        }
         return await this._service.update(id,item);
     };
 
     @Get()
-    public async findAll(): Promise<T[]> {
-        return await this._service.findAll();
+    @UsePipes(new ValidationPipe({ transform: true }))
+    protected async findAll(@Query() paginationDto: PaginationDto): Promise<PaginatedResult<T>> {
+        return await this._service.findAll(paginationDto);
     };
 
     @Get(':id')
-    public async findOneById(@Param('id') id: string): Promise<T> {
-        return await this._service.findOneById(id);
+    protected async findOneById(@Param('id', ValidateIdPipe) id: string) {
+        let entity: T = await this._service.findOneById(id);
+        if(entity){
+            return entity;
+        }
+        throw new HttpException(`Item with id: ${id} does not exist`,HttpStatus.NOT_FOUND);
     };
 
     @Delete(':id')
-    public async delete(@Param('id') id: string): Promise<boolean> {
+    protected async delete(@Param('id') id: string): Promise<boolean> {
         return await this._service.delete(id); 
-    };  
+    };
 };

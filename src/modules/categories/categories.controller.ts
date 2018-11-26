@@ -1,9 +1,9 @@
-import { Controller, Post, Put, Body, Param} from '@nestjs/common';
+import { Controller, Post, Put, Body, Param, UsePipes, ValidationPipe} from '@nestjs/common';
 import { CategoryEntity } from './interfaces/category.entity.interface';
 import { BaseController } from './../base/base.controller';
 import { CategoriesService } from './categories.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-
+import { CreateCategoryDto, UpdateCategoryDto } from './dto';
+import { ValidateIdPipe } from './../base/pipes/validate-id.pipe';
 
 @Controller('category')
 export class CategoriesController extends BaseController<CategoryEntity> {
@@ -13,12 +13,13 @@ export class CategoriesController extends BaseController<CategoryEntity> {
   }
 
   @Post()
+  @UsePipes(new ValidationPipe({ transform: true }))
   public async insert(@Body() categoryDto: CreateCategoryDto) {
       return await this.create(categoryDto);
   }
 
   @Put(':id')
-  public async updateItem(@Param('id') id: string, @Body() categoryDto: CreateCategoryDto) {
+  public async updateItem(@Param('id', ValidateIdPipe) id: string, @Body(new ValidationPipe({ transform: true })) categoryDto: UpdateCategoryDto) {
       return await this.update(id,categoryDto);
   }
 }

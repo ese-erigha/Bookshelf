@@ -1,10 +1,13 @@
-import { Module } from '@nestjs/common';
+import { Module} from '@nestjs/common';
+import {APP_PIPE} from "@nestjs/core";
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from './modules/config/config.module';
 import { ConfigService } from './modules/config/config.service';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+//import { AppController } from './app.controller';
+//import { AppService } from './app.service';
 import { CategoriesModule } from './modules/categories/categories.module';
+import { AuthorsModule } from './modules/authors/authors.module';
+import { BooksModule } from './modules/books/books.module';
 
 
 
@@ -18,12 +21,16 @@ import { CategoriesModule } from './modules/categories/categories.module';
       }),
       inject: [ConfigService]
     }),
-    CategoriesModule
+    CategoriesModule,
+    AuthorsModule,
+    BooksModule
   ],
   //controllers: [AppController],
   //providers: [AppService],
   controllers: [],
-  providers: []
+  providers: [
+    
+  ]
   
 })
 export class AppModule {}
