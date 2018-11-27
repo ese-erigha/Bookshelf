@@ -1,3 +1,4 @@
+import { CategoryDto } from './../../categories/dto/category.dto';
 import moment from 'moment';
 import { BaseDto } from './../../base/base.dto';
 import { AuthorDto } from './../../authors/dto/author.dto';
@@ -40,16 +41,16 @@ export class BookDto extends BaseDto{
     @IsNotEmpty()
     @IsArray()
     @Exclude()
-    readonly existingCategories: string[];
+    existingCategories: CategoryDto[];
 
     @IsArray()
     @Exclude()
-    readonly newCategories: string[];
+    readonly newCategories: CategoryDto[];
 
     @IsNotEmpty()
     @IsArray()
     @Exclude()
-    readonly existingAuthors: AuthorDto[];
+    existingAuthors: AuthorDto[];
 
     @IsArray()
     @Exclude()

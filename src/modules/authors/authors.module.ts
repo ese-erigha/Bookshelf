@@ -6,7 +6,6 @@ import { AuthorsController } from './authors.controller';
 import { AuthorSchema } from './schemas/author.schema';
 import { IsAuthorAlreadyExist } from './validators/IsAuthorAlreadyExist';
 
-
 @Module({
   imports: [MongooseModule.forFeature([{ name: 'Author', schema: AuthorSchema }])],
   controllers: [AuthorsController],

@@ -1,3 +1,5 @@
+import { CategoryDto } from './../categories/dto/category.dto';
+import { AuthorDto } from './../authors/dto/author.dto';
 import { CreateBookDto } from './dto/create-book.dto';
 import { IBookRepository } from './interfaces/IBook.repository';
 import { BaseRepository } from '../base/base.repository';
@@ -17,12 +19,20 @@ export class BooksRepository extends BaseRepository<BookEntity> implements IBook
 
   public async createNewBook(bookDto: CreateBookDto): Promise<BookEntity>{
     
-    //Need to save new Authors and New Categories before saving book
+
     const dto = classToPlain(bookDto);
     let bookEntity: BookEntity = new this._dbSet(dto);
+
+    //Save New Authors
+    bookDto.existingAuthors.forEach((author: AuthorDto)=>{
+      bookEntity.authors.push(author.id);
+    });
     
-    
-    
-    throw new Error(); //implement custom create function
+    //Save New Categories
+    bookDto.existingCategories.forEach((category: CategoryDto)=>{
+        bookEntity.categories.push(category.id);
+    });
+
+     return await bookEntity.save();
   }
 }
