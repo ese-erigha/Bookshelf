@@ -1,7 +1,7 @@
 export interface ValidationResult{
     target: object,
     property: string,
-    children: string[],
+    children: Array<string>,
     constraints: object,
     isValid: boolean 
 }

@@ -1,17 +1,12 @@
-import { CategoryEntity } from './../categories/interfaces/category.entity.interface';
-import { CategoryDto } from './../categories/dto/category.dto';
-import { Controller, Post, Put, Body, Param, UsePipes, ValidationPipe} from '@nestjs/common';
+import { BookDto } from './dto/book.dto';
+import { BookQueryDto } from './dto/book.query.dto';
+import { Schema } from 'mongoose';
+import { Controller, Post, Put, Get,Body, Param, UsePipes, ValidationPipe,HttpException,HttpStatus} from '@nestjs/common';
 import { BookEntity } from './interfaces/book.entity.interface';
 import { BaseController } from './../base/base.controller';
 import { BooksService } from './books.service';
-import { CreateBookDto } from './dto';
+import { CreateBookDto, UpdateBookDto } from './dto';
 import { ValidateIdPipe } from './../base/pipes/validate-id.pipe';
-import { AuthorsService } from '../authors/authors.service';
-import { CategoriesService } from './../categories/categories.service';
-import { AuthorsValidationService } from './services/authors.validation.service';
-import { AuthorDto } from './../authors/dto/author.dto';
-import { AuthorEntity } from './../authors/interfaces/author.entity.interface';
-import { ValidationResult } from './validators/validation-result.interface';
 import {BookCustomService} from './services/book.custom.service';
 
 
@@ -19,7 +14,7 @@ import {BookCustomService} from './services/book.custom.service';
 export class BooksController extends BaseController<BookEntity> {
 
   private readonly _bookService: BooksService;
-  constructor(booksService: BooksService,private readonly authorsValidationService: AuthorsValidationService, private readonly _authorService: AuthorsService, private readonly _categoryService: CategoriesService, private readonly _bookCustomService: BookCustomService){
+  constructor(booksService: BooksService, private readonly _bookCustomService: BookCustomService){
     super(booksService);
     this._bookService = booksService;
   }
@@ -28,13 +23,36 @@ export class BooksController extends BaseController<BookEntity> {
   @UsePipes(new ValidationPipe({ transform: true }))
   public async insert(@Body() bookDto: CreateBookDto) {
 
-    this.authorsValidationService.validateAuthors(bookDto); //throws an HTTPException if validation fails
-    bookDto = await this._bookCustomService.saveForeignEntities(bookDto);
-    return await this._bookService.createNewBook(bookDto);
+    //let status = await this._bookCustomService.validateAuthors(bookDto); //throws an HTTPException if validation fails
+    //status = await this._bookCustomService.validateCategories(bookDto); //throws an HTTPException if validation fails
+    //let nBookDto: BookDto = await this._bookCustomService.saveForeignEntities(bookDto);
+
+    let nBookDto: BookDto = await this._bookCustomService.preSaveHook(bookDto);
+    return await this._bookService.createNewBook(nBookDto);
+    
   }
 
-//   @Put(':id')
-//   public async updateItem(@Param('id', ValidateIdPipe) id: string, @Body(new ValidationPipe({ transform: true })) authorDto: UpdateAuthorDto) {
-//       return await this.update(id,authorDto);
-//   }
+  @Get(':id/populate')
+  protected async findOneByIdAndPopulate(@Param('id', ValidateIdPipe) id: Schema.Types.ObjectId) {
+
+      let query: BookQueryDto = {
+        _id: id
+      }
+      
+      let entity: BookEntity = await this._bookService.fetchBookWithPopulation(query);
+      if(entity){
+        return entity;
+      }
+      throw new HttpException(`Item with id: ${id} does not exist`,HttpStatus.NOT_FOUND);
+  };
+
+  @Put(':id')
+  public async updateItem(@Param('id', ValidateIdPipe) id: Schema.Types.ObjectId, @Body(new ValidationPipe({ transform: true })) bookDto: UpdateBookDto) {
+      let entity: BookEntity = await this._service.findOneById(id);
+      if(entity == null){
+        throw new HttpException(`Item with id: ${id} does not exist`,HttpStatus.NOT_FOUND);
+      }
+      let nBookDto: BookDto = await this._bookCustomService.preSaveHook(bookDto);
+      return await this._bookService.updateBook(id,nBookDto);
+  }
 }

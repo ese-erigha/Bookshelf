@@ -4,8 +4,9 @@ import {
     ValidatorConstraintInterface,
     ValidationArguments
   } from 'class-validator';
-  import { CategoriesService } from './../categories.service';
+import { CategoriesService } from './../categories.service';
 import { Injectable } from '@nestjs/common';
+import { CategoryQueryDto } from '../interfaces/category.query.dto';
 
 
   @ValidatorConstraint({name: 'isCategoryAlreadyExist', async: true})
@@ -15,7 +16,12 @@ import { Injectable } from '@nestjs/common';
     constructor(protected readonly categoryService: CategoriesService){}
 
     async validate(text: string, validationArguments:ValidationArguments){
-        const category: CategoryEntity = await this.categoryService.findOne({name: text});
+
+       let query: CategoryQueryDto = {
+        name : text
+       }
+       
+        const category: CategoryEntity = await this.categoryService.findOne(query);
         return category ? false : true;
     }
   }

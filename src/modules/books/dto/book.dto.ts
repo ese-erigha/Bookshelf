@@ -1,9 +1,8 @@
 import { CategoryDto } from './../../categories/dto/category.dto';
-import moment from 'moment';
 import { BaseDto } from './../../base/base.dto';
 import { AuthorDto } from './../../authors/dto/author.dto';
-import {IsString, IsNumber, IsUrl, IsDateString, MaxDate, MinLength,IsNotEmpty, IsIn, IsArray} from 'class-validator';
-import {Exclude} from 'class-transformer';
+import {IsString, IsNumber, IsUrl, IsDateString, MinLength,IsNotEmpty, IsIn, IsArray, IsOptional} from 'class-validator';
+
 
 export class BookDto extends BaseDto{
 
@@ -24,9 +23,9 @@ export class BookDto extends BaseDto{
 
     @IsNotEmpty()
     @IsDateString()
-    @MaxDate(moment().add(1, 'days').toDate())
     readonly publishedDate: Date;
 
+    @IsOptional()
     @IsNotEmpty()
     @IsString()
     @MinLength(3)
@@ -40,20 +39,18 @@ export class BookDto extends BaseDto{
 
     @IsNotEmpty()
     @IsArray()
-    @Exclude()
-    existingCategories: CategoryDto[];
+    existingCategories: Array<CategoryDto>;
 
+    @IsOptional()
     @IsArray()
-    @Exclude()
-    readonly newCategories: CategoryDto[];
+    readonly newCategories: Array<CategoryDto>;
 
     @IsNotEmpty()
     @IsArray()
-    @Exclude()
-    existingAuthors: AuthorDto[];
+    existingAuthors: Array<AuthorDto>;
 
+    @IsOptional()
     @IsArray()
-    @Exclude()
-    readonly newAuthors: AuthorDto[];
+    readonly newAuthors: Array<AuthorDto>;
 
 }

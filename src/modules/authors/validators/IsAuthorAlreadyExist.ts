@@ -1,3 +1,4 @@
+import { AuthorQueryDto } from './../interfaces/author.query.dto';
 import { AuthorEntity } from '../interfaces/author.entity.interface';
 import {
     ValidatorConstraint,
@@ -15,7 +16,8 @@ import { Injectable } from '@nestjs/common';
     constructor(protected readonly authorService: AuthorsService){}
 
     async validate(text: string, validationArguments:ValidationArguments){
-        const author: AuthorEntity = await this.authorService.findOne({name: text});
+        let query : AuthorQueryDto = {fullName: text};  
+        const author: AuthorEntity = await this.authorService.findOne(query);
         return author ? false : true;
     }
   }

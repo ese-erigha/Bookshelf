@@ -1,3 +1,4 @@
+import { Schema } from 'mongoose';
 import { Controller, Post, Put, Body, Param, UsePipes, ValidationPipe} from '@nestjs/common';
 import { CategoryEntity } from './interfaces/category.entity.interface';
 import { BaseController } from './../base/base.controller';
@@ -19,7 +20,7 @@ export class CategoriesController extends BaseController<CategoryEntity> {
   }
 
   @Put(':id')
-  public async updateItem(@Param('id', ValidateIdPipe) id: string, @Body(new ValidationPipe({ transform: true })) categoryDto: UpdateCategoryDto) {
+  public async updateItem(@Param('id', ValidateIdPipe) id: Schema.Types.ObjectId, @Body(new ValidationPipe({ transform: true })) categoryDto: UpdateCategoryDto) {
       return await this.update(id,categoryDto);
   }
 }

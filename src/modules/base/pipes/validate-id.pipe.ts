@@ -1,13 +1,13 @@
-import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException, NotFoundException } from '@nestjs/common';
+import { PipeTransform, Injectable, ArgumentMetadata, NotFoundException } from '@nestjs/common';
 import * as mongoose from 'mongoose';
 
 @Injectable()
 export class ValidateIdPipe implements PipeTransform<any> {
+  
   async transform(value, { metatype }: ArgumentMetadata) {
     // if (!metatype || !this.toValidate(metatype)) {
     //   return value;
     // }
-    
     
     if (!mongoose.Types.ObjectId.isValid(value)) {
       throw new NotFoundException(`Item with id ${value} could not be found`);

@@ -1,3 +1,4 @@
+import { BookQueryDto } from './../dto/book.query.dto';
 import { BookEntity } from '../interfaces/book.entity.interface';
 import {
     ValidatorConstraint,
@@ -15,7 +16,8 @@ export class IsBookAlreadyExist implements ValidatorConstraintInterface{
     constructor(protected readonly bookService: BooksService){}
 
     async validate(text: string, validationArguments:ValidationArguments){
-        const book: BookEntity = await this.bookService.findOne({title: text});
+        let query: BookQueryDto = {title: text};
+        const book: BookEntity = await this.bookService.findOne(query);
         return book ? false : true;
     }
 }

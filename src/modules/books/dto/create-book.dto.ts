@@ -7,7 +7,7 @@ export class CreateBookDto extends BookDto{
     @IsString()
     @MinLength(3)
     @IsNotEmpty()
-    @Validate(IsBookAlreadyExist)
+    @Validate(IsBookAlreadyExist,{message: "Book already exist"})
     readonly title: string;
 
 }

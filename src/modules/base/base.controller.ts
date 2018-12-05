@@ -1,7 +1,10 @@
+import { Schema } from 'mongoose';
 import { Get, Delete, Param, Query, UsePipes, ValidationPipe, HttpStatus, HttpException} from '@nestjs/common';
+import { ValidateIdPipe } from './pipes/validate-id.pipe';
 import { BaseEntity, BaseDto, IBaseService, PaginatedResult } from '../../../src/modules/base/interfaces';
 import {PaginationDto} from './pagination.dto';
-import { ValidateIdPipe } from './pipes/validate-id.pipe';
+import { Roles } from './decorators/roles.decorator';
+import { ApplicationRoles } from './roles';
 
 
 export class BaseController<T extends BaseEntity>{
@@ -16,7 +19,7 @@ export class BaseController<T extends BaseEntity>{
         return await this._service.create(item);
     };
 
-    protected async update(id: string, item: BaseDto): Promise<T> {
+    protected async update(id: Schema.Types.ObjectId, item: BaseDto): Promise<T> {
         let entity: T = await this._service.findOneById(id);
         if(entity == null){
             throw new HttpException(`Item with id: ${id} does not exist`,HttpStatus.NOT_FOUND);
@@ -25,13 +28,14 @@ export class BaseController<T extends BaseEntity>{
     };
 
     @Get()
+    @Roles(ApplicationRoles.Admin,ApplicationRoles.User)    
     @UsePipes(new ValidationPipe({ transform: true }))
     protected async findAll(@Query() paginationDto: PaginationDto): Promise<PaginatedResult<T>> {
         return await this._service.findAll(paginationDto);
     };
 
     @Get(':id')
-    protected async findOneById(@Param('id', ValidateIdPipe) id: string) {
+    protected async findOneById(@Param('id', ValidateIdPipe) id: Schema.Types.ObjectId) {
         let entity: T = await this._service.findOneById(id);
         if(entity){
             return entity;
@@ -40,7 +44,7 @@ export class BaseController<T extends BaseEntity>{
     };
 
     @Delete(':id')
-    protected async delete(@Param('id') id: string): Promise<boolean> {
+    protected async delete(@Param('id') id: Schema.Types.ObjectId): Promise<boolean> {
         return await this._service.delete(id); 
     };
 };

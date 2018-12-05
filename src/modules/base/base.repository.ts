@@ -1,7 +1,11 @@
+import { classToPlain } from 'class-transformer';
+import { BaseQueryDto } from './interfaces/base.query.dto';
+import { Schema } from 'mongoose';
 import { BaseEntity, BaseDto, BaseModel, PaginatedResult } from '../../../src/modules/base/interfaces';
 import { IBaseRepository } from "./interfaces";
 import { Injectable } from '@nestjs/common';
 import { PaginationDto } from './pagination.dto';
+import { Session } from 'inspector';
 
 @Injectable()
 export class BaseRepository<T extends BaseEntity> implements IBaseRepository<T>{
@@ -13,11 +17,12 @@ export class BaseRepository<T extends BaseEntity> implements IBaseRepository<T>{
     }
 
     public async create(item: BaseDto): Promise<T> {
+        
         const createdEntity = new this._dbSet(item);
         return await createdEntity.save();
     };
 
-    public async update(id: string, item: BaseDto): Promise<T> {
+    public async update(id: Schema.Types.ObjectId, item: BaseDto): Promise<T> {
         return await this._dbSet.findByIdAndUpdate(id,item,{new: true}).lean().exec();
     };
 
@@ -36,16 +41,17 @@ export class BaseRepository<T extends BaseEntity> implements IBaseRepository<T>{
                                
     };
 
-    public async findOneById(id: string): Promise<T> {
+    public async findOneById(id: Schema.Types.ObjectId): Promise<T> {
         return await this._dbSet.findOne({'_id': id}).lean().exec();
     };
 
-    public async delete(id: string): Promise<boolean> {
+    public async delete(id: Schema.Types.ObjectId): Promise<boolean> {
         throw new Error("Method not implemented.");
     };
 
-    public async findOne(cond:object): Promise<T>{
-        return await this._dbSet.findOne(cond).lean().exec();
+    public async findOne(cond: BaseQueryDto): Promise<T>{
+        let query = classToPlain(cond);
+        return await this._dbSet.findOne(query).lean().exec();
     }
     
 };
